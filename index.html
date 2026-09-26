@@ -43,7 +43,16 @@
     margin-top:16px; font-size:.85rem; color:var(--gold); background:rgba(255,209,102,.1);
     border:1px dashed rgba(255,209,102,.4); padding:10px 14px; border-radius:10px; line-height:1.5;
   }
-  video{width:100%; border-radius:16px; background:#000; margin-bottom:16px;}
+  video{width:100%; border-radius:16px; background:#000; margin-bottom:16px; pointer-events:none;}
+  .video-wrap{position:relative; width:100%; margin-bottom:16px;}
+  .video-wrap video{margin-bottom:0;}
+  .play-btn{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:78px; height:78px; border-radius:50%; background:rgba(255,255,255,.95);
+    display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--purple);
+    cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.4); pointer-events:auto;
+  }
+  .play-btn.hidden-btn{display:none;}
   .gift-box{font-size:5rem; cursor:pointer; animation:wiggle 1.6s ease-in-out infinite; user-select:none;}
   @keyframes wiggle{0%,100%{transform:rotate(0deg);}25%{transform:rotate(-8deg);}75%{transform:rotate(8deg);}}
   .tap-hint{margin-top:10px; opacity:.8; font-size:.95rem;}
@@ -51,7 +60,7 @@
     text-shadow:0 0 20px rgba(255,209,102,.6); animation:pop .5s ease;}
   @keyframes pop{0%{transform:scale(.3); opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1); opacity:1;}}
   .bday-photo{
-    width:160px; height:160px; border-radius:50%; object-fit:cover; margin:0 auto 20px;
+    width:100%; max-width:340px; aspect-ratio:1/1; border-radius:20px; object-fit:cover; margin:0 auto 20px;
     border:4px solid var(--gold); box-shadow:0 0 30px rgba(255,209,102,.5); display:block;
     animation:pop .6s ease;
   }
@@ -81,15 +90,15 @@
   <p class="sub">শুরু করার আগে এই ছোট্ট কয়েকটা প্রশ্নের উত্তর দাও তো 👇</p>
   <div class="field">
     <label>তোমার নাম লেখো</label>
-    <input id="q-name" type="text" placeholder="যেমন: Sonadi">
+    <input id="q-name" type="text" placeholder="এখানে লেখো...">
   </div>
   <div class="field">
     <label>আজকে তোমার মনটা কেমন? (এক কথায়)</label>
-    <input id="q-mood" type="text" placeholder="যেমন: Excited 😄">
+    <input id="q-mood" type="text" placeholder="এখানে লেখো...">
   </div>
   <div class="field">
     <label>একটা birthday wish লেখো নিজের জন্য</label>
-    <input id="q-wish" type="text" placeholder="যেমন: সবসময় হাসিখুশি থাকতে চাই">
+    <input id="q-wish" type="text" placeholder="এখানে লেখো...">
   </div>
   <button onclick="goToVideo()">পরের ধাপে যাও ➜</button>
 </div>
@@ -97,7 +106,10 @@
 <div id="screen-video" class="screen">
   <h1 id="video-greet">তাহলে শুরু করা যাক 🎉</h1>
   <p class="sub" id="video-msg"></p>
-  <video id="bday-video" src="video.mp4" controls playsinline webkit-playsinline="true" x-webkit-airplay="allow" controlsList="nodownload noremoteplayback" oncontextmenu="return false"></video>
+  <div class="video-wrap">
+    <video id="bday-video" src="video.mp4" playsinline webkit-playsinline="true" x-webkit-airplay="allow" controlsList="nodownload noremoteplayback nofullscreen" disablePictureInPicture oncontextmenu="return false"></video>
+    <div class="play-btn" id="play-btn" onclick="startVideo()">▶</div>
+  </div>
   <div class="warn">🔊 সাউন্ড অন করে, স্কিপ না করে পুরো ভিডিওটা দেখো — শেষে একটা সারপ্রাইজ আছে!</div>
 </div>
 
@@ -118,7 +130,7 @@
 <script>
 // ===== TIME LOCK =====
 // Eikhane target unlock date/time set koro (year-month-day T hour:minute:second)
-const UNLOCK_AT = new Date('2026-09-27T00:00:00');
+const UNLOCK_AT = new Date('2020-01-01T00:00:00'); // TEST MODE: already unlocked
 
 function pad(n){ return n.toString().padStart(2,'0'); }
 
@@ -169,6 +181,11 @@ vid.addEventListener('seeking', ()=>{
   if(vid.currentTime > lastTime + 1){ vid.currentTime = lastTime; }
 });
 vid.addEventListener('ended', ()=>{ switchScreen('screen-gift'); });
+
+function startVideo(){
+  document.getElementById('play-btn').classList.add('hidden-btn');
+  vid.play();
+}
 
 function openGift(){
   switchScreen('screen-final');
