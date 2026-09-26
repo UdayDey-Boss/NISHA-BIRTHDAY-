@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Happy Birthday Surprise</title>
+<style>
+  :root{
+    --pink:#ff5e9e; --purple:#7b2ff7; --gold:#ffd166; --bg1:#2d1b4e; --bg2:#5b2a86;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{height:100%;}
+  body{
+    min-height:100%; font-family:'Segoe UI',system-ui,sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:#fff; overflow-x:hidden; display:flex; align-items:center; justify-content:center;
+    padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px));
+  }
+  .screen{width:100%; max-width:480px; text-align:center; display:none; animation:fadeIn .6s ease;}
+  .screen.active{display:block;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(15px);} to{opacity:1; transform:translateY(0);}}
+  h1{font-size:1.6rem; margin-bottom:14px; color:var(--gold);}
+  p.sub{opacity:.85; margin-bottom:24px; line-height:1.5;}
+  .balloon{font-size:2rem; display:inline-block; animation:float 3s ease-in-out infinite;}
+  .balloon:nth-child(2){animation-delay:.3s;} .balloon:nth-child(3){animation-delay:.6s;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+  .field{margin-bottom:18px; text-align:left;}
+  label{display:block; margin-bottom:6px; font-size:.95rem; color:#ffd9ec;}
+  input{
+    width:100%; padding:12px 14px; border-radius:12px; border:2px solid rgba(255,255,255,.25);
+    background:rgba(255,255,255,.08); color:#fff; font-size:1rem; outline:none;
+  }
+  input:focus{border-color:var(--pink);}
+  input::placeholder{color:rgba(255,255,255,.4);}
+  button{
+    background:linear-gradient(135deg,var(--pink),var(--purple));
+    color:#fff; border:none; padding:14px 28px; border-radius:30px; font-size:1.05rem;
+    font-weight:600; cursor:pointer; margin-top:8px; box-shadow:0 6px 20px rgba(255,94,158,.4);
+  }
+  button:active{transform:scale(.97);}
+  .warn{
+    margin-top:16px; font-size:.85rem; color:var(--gold); background:rgba(255,209,102,.1);
+    border:1px dashed rgba(255,209,102,.4); padding:10px 14px; border-radius:10px; line-height:1.5;
+  }
+  video{width:100%; border-radius:16px; background:#000; margin-bottom:16px;}
+  .gift-box{font-size:5rem; cursor:pointer; animation:wiggle 1.6s ease-in-out infinite; user-select:none;}
+  @keyframes wiggle{0%,100%{transform:rotate(0deg);}25%{transform:rotate(-8deg);}75%{transform:rotate(8deg);}}
+  .tap-hint{margin-top:10px; opacity:.8; font-size:.95rem;}
+  .final-text{font-size:2.1rem; font-weight:800; color:var(--gold); line-height:1.4;
+    text-shadow:0 0 20px rgba(255,209,102,.6); animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(.3); opacity:0;}70%{transform:scale(1.15);}100%{transform:scale(1); opacity:1;}}
+  .bday-photo{
+    width:160px; height:160px; border-radius:50%; object-fit:cover; margin:0 auto 20px;
+    border:4px solid var(--gold); box-shadow:0 0 30px rgba(255,209,102,.5); display:block;
+    animation:pop .6s ease;
+  }
+  .music-note{margin-top:14px; font-size:.9rem; opacity:.75;}
+  .confetti{position:fixed; top:-10px; width:8px; height:14px; border-radius:2px; z-index:5;
+    animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(600deg); opacity:.3;}}
+  .hidden{display:none !important;}
+  .lock-icon{font-size:3.5rem; margin-bottom:10px; animation:float 3s ease-in-out infinite;}
+  .countdown{font-size:2.2rem; font-weight:800; color:var(--gold); letter-spacing:2px; margin:16px 0;}
+  .countdown span{display:inline-block; min-width:70px;}
+</style>
+</head>
+<body>
+
+<div id="screen-lock" class="screen active">
+  <div class="lock-icon">🔒🎂</div>
+  <h1>লিংক ঠিক আছে! 💌</h1>
+  <p class="sub">কিন্তু surprise টা এখনো unlock হয়নি। নিচের সময় শেষ হলেই automatically খুলে যাবে —</p>
+  <div class="countdown" id="countdown-text">--:--:--</div>
+  <div class="warn">এই ট্যাবটা খোলা রেখে দাও অথবা ঠিক ১২টার পর আবার খোলো, তাহলেই surprise শুরু হবে 🎁</div>
+</div>
+
+<div id="screen-intro" class="screen">
+  <div><span class="balloon">🎈</span><span class="balloon">🎂</span><span class="balloon">🎈</span></div>
+  <h1>একটা স্পেশাল সারপ্রাইজ অপেক্ষা করছে!</h1>
+  <p class="sub">শুরু করার আগে এই ছোট্ট কয়েকটা প্রশ্নের উত্তর দাও তো 👇</p>
+  <div class="field">
+    <label>তোমার নাম লেখো</label>
+    <input id="q-name" type="text" placeholder="যেমন: Sonadi">
+  </div>
+  <div class="field">
+    <label>আজকে তোমার মনটা কেমন? (এক কথায়)</label>
+    <input id="q-mood" type="text" placeholder="যেমন: Excited 😄">
+  </div>
+  <div class="field">
+    <label>একটা birthday wish লেখো নিজের জন্য</label>
+    <input id="q-wish" type="text" placeholder="যেমন: সবসময় হাসিখুশি থাকতে চাই">
+  </div>
+  <button onclick="goToVideo()">পরের ধাপে যাও ➜</button>
+</div>
+
+<div id="screen-video" class="screen">
+  <h1 id="video-greet">তাহলে শুরু করা যাক 🎉</h1>
+  <p class="sub" id="video-msg"></p>
+  <video id="bday-video" src="video.mp4" controls playsinline webkit-playsinline="true" x-webkit-airplay="allow" controlsList="nodownload noremoteplayback" oncontextmenu="return false"></video>
+  <div class="warn">🔊 সাউন্ড অন করে, স্কিপ না করে পুরো ভিডিওটা দেখো — শেষে একটা সারপ্রাইজ আছে!</div>
+</div>
+
+<div id="screen-gift" class="screen">
+  <h1>ভিডিও শেষ! 🎬</h1>
+  <p class="sub">এখনই ট্যাব বন্ধ কোরো না... নিচের গিফট বক্সে ট্যাপ করো 👇</p>
+  <div class="gift-box" onclick="openGift()">🎁</div>
+  <div class="tap-hint">← এখানে ট্যাপ করো</div>
+</div>
+
+<div id="screen-final" class="screen">
+  <img class="bday-photo" src="photo.jpg" alt="Birthday">
+  <div class="final-text" id="final-msg">HAPPY BIRTHDAY<br>SONADI 🎂🎉</div>
+  <div class="music-note">🎵 gaan bajche...</div>
+  <audio id="bday-music" src="music.mp3" loop></audio>
+</div>
+
+<script>
+// ===== TIME LOCK =====
+// Eikhane target unlock date/time set koro (year-month-day T hour:minute:second)
+const UNLOCK_AT = new Date('2026-09-27T00:00:00');
+
+function pad(n){ return n.toString().padStart(2,'0'); }
+
+function checkLock(){
+  const now = new Date();
+  const diff = UNLOCK_AT - now;
+  if(diff <= 0){
+    clearInterval(lockTimer);
+    switchScreen('screen-intro');
+    return;
+  }
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  document.getElementById('countdown-text').textContent = pad(h)+':'+pad(m)+':'+pad(s);
+}
+let lockTimer;
+if(UNLOCK_AT - new Date() <= 0){
+  // already past unlock time when page loads
+  document.addEventListener('DOMContentLoaded', ()=>switchScreen('screen-intro'));
+} else {
+  document.addEventListener('DOMContentLoaded', ()=>{
+    checkLock();
+    lockTimer = setInterval(checkLock, 1000);
+  });
+}
+
+function goToVideo(){
+  const name = document.getElementById('q-name').value.trim() || 'তুমি';
+  const mood = document.getElementById('q-mood').value.trim();
+  const wish = document.getElementById('q-wish').value.trim();
+  document.getElementById('video-greet').textContent = name + ', তোমার জন্য এই ভিডিওটা 💌';
+  let msg = 'তোমার আজকের মুড: "' + (mood||'—') + '" — মনে রেখো তোমার wish: "' + (wish||'—') + '" 🌟';
+  document.getElementById('video-msg').textContent = msg;
+  switchScreen('screen-video');
+}
+
+function switchScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// anti-skip: prevent seeking forward
+const vid = document.getElementById('bday-video');
+let lastTime = 0;
+vid.addEventListener('timeupdate', ()=>{ if(!vid.seeking) lastTime = vid.currentTime; });
+vid.addEventListener('seeking', ()=>{
+  if(vid.currentTime > lastTime + 1){ vid.currentTime = lastTime; }
+});
+vid.addEventListener('ended', ()=>{ switchScreen('screen-gift'); });
+
+function openGift(){
+  switchScreen('screen-final');
+  burstConfetti();
+  const music = document.getElementById('bday-music');
+  music.volume = 0.8;
+  music.play().catch(()=>{ /* if blocked, user can tap photo/text to retry */ });
+}
+
+function burstConfetti(){
+  const colors = ['#ff5e9e','#ffd166','#7b2ff7','#4fd3c4','#ffffff'];
+  for(let i=0;i<60;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random()*100+'vw';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration = (2+Math.random()*2)+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 4500);
+  }
+}
+</script>
+</body>
+</html>
